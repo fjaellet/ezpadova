@@ -1,9 +1,8 @@
-EZPADOVA -- A python package that allows you to download PADOVA isochrones directly from their website
-======================================================================================================
+EZPADOVA 
+=========
 
-
-This small package provides a direct interface to the PADOVA/PARSEC isochrone webpage (http://stev.oapd.inaf.it/cgi-bin/cmd).
-It compiles the URL needed to query the website and retrives the data into a python variable.
+A python package that allows you to download PADOVA/PARSEC isochrones directly
+from their website (http://stev.oapd.inaf.it/cgi-bin/cmd).
 
 :version: 0.1dev
 :author: MF
