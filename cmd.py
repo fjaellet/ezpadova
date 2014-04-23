@@ -422,3 +422,11 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, ret_table=True, **kwargs):
         return __convert_to_Table(r, d)
     else:
         return r
+
+
+r = get_t_isochrones(6.0, 7.0, 0.05, 0.02)
+import pylab as plt
+plt.scatter(r['logTe'], r['logL/Lo'], c=r['log(age/yr)'], edgecolor='None')
+print r['logL/Lo']
+plt.show()
+#r.write('myiso.fits')

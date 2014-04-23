@@ -7,7 +7,13 @@ It compiles the URL needed to query the website and retrives the data into a pyt
 
 :version: 0.1dev
 :author: MF
-:requirements: eztables (github.com/mfouesneau/eztables)
+
+Requirements
+-------------
+* eztables (github.com/mfouesneau/eztables)
+* pyfits (`sudo pip install pyfits`)
+* numexpr (`sudo pip install numexpr`)
+* cython (`sudo pip install cython`)
 
 
 TODO list
