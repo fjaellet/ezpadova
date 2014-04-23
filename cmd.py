@@ -1,9 +1,12 @@
 """
-EZPADOVA -- A python package that allows you to download PADOVA isochrones directly from their website
+EZPADOVA -- A python package that allows you to download PADOVA isochrones
+directly from their website
 
 
-This small package provides a direct interface to the PADOVA/PARSEC isochrone webpage (http://stev.oapd.inaf.it/cgi-bin/cmd).
-It compiles the URL needed to query the website and retrives the data into a python variable.
+This small package provides a direct interface to the PADOVA/PARSEC isochrone
+webpage (http://stev.oapd.inaf.it/cgi-bin/cmd).
+It compiles the URL needed to query the website and retrives the data into a
+python variable.
 
 :version: 0.1dev
 :author: MF
@@ -86,11 +89,13 @@ map_phot = {"2mass_spitzer": " 2MASS + Spitzer (IRAC+MIPS)",
             "wfc3ir": "HST/WFC3 IR channel (final throughputs)",
             "wfc3uvis1": "HST/WFC3 UVIS channel, chip 1 (final throughputs)",
             "wfc3uvis2": "HST/WFC3 UVIS channel, chip 2 (final throughputs)",
-            "wfc3_medium": "HST/WFC3 medium filters (UVIS1+IR, final throughputs)",
+            "wfc3_medium": "HST/WFC3 medium filters (UVIS1+IR, final \
+throughputs)",
             "wfc3": "HST/WFC3 wide filters (UVIS1+IR, final throughputs)",
             "wfpc2": "HST/WFPC2 (Vegamag, cf. Holtzman et al. 1995)",
             "kepler": "Kepler + SDSS griz + DDO51 (in ABmags)",
-            "kepler_2mass": "Kepler + SDSS griz + DDO51 (in ABmags) + 2MASS (~Vegamag)",
+            "kepler_2mass": "Kepler + SDSS griz + DDO51 (in ABmags) + \
+2MASS (~Vegamag)",
             "ogle": "OGLE-II",
             "panstarrs1": "Pan-STARRS1",
             "sloan": "SDSS ugriz",
@@ -110,10 +115,17 @@ map_phot = {"2mass_spitzer": " 2MASS + Spitzer (IRAC+MIPS)",
 
 #available tracks
 map_models = {
-    '2010': ('gi10a',  'Marigo et al. (2008) with the Girardi et al. (2010) Case A correction for low-mass, low-metallicity AGB tracks'),
-    '2010b': ('gi10b',  'Marigo et al. (2008) with the Girardi et al. (2010) Case B correction for low-mass, low-metallicity AGB tracks'),
-    '2008': ('ma08',   'Marigo et al. (2008): Girardi et al. (2000) up to early-AGB + detailed TP-AGB from Marigo & Girardi (2007) (for M <= 7 Msun) + Bertelli et al. (1994) (for M > 7 Msun) + additional Z=0.0001 and Z=0.001 tracks.'),
-    '2002': ('gi2000', 'Basic set of Girardi et al. (2002) : Girardi et al. (2000) + simplified TP-AGB (for M <= 7 Msun) + Bertelli et al. (1994) (for M > 7 Msun) + additional Z=0.0001 and Z=0.001 tracks.')
+    '2010': ('gi10a', 'Marigo et al. (2008) with the Girardi et al. (2010) \
+Case A correction for low-mass, low-metallicity AGB tracks'),
+    '2010b': ('gi10b', 'Marigo et al. (2008) with the Girardi et al. (2010) \
+Case B correction for low-mass, low-metallicity AGB tracks'),
+    '2008': ('ma08', 'Marigo et al. (2008): Girardi et al. (2000) up to \
+early-AGB + detailed TP-AGB from Marigo & Girardi (2007) (for M <= 7 Msun) \
+Bertelli et al. (1994) (for M > 7 Msun) + additional Z=0.0001 and Z=0.001 \
+tracks.'),
+    '2002': ('gi2000', 'Basic set of Girardi et al. (2002) : Girardi et al. \
+(2000) + simplified TP-AGB (for M <= 7 Msun) + Bertelli et al. (1994) \
+(for M > 7 Msun) + additional Z=0.0001 and Z=0.001 tracks.')
 }
 
 
@@ -123,8 +135,10 @@ def help_models():
 
 
 map_carbon_stars = {
-    'loidl': ('loidl01', 'Loidl et al. (2001) (as in Marigo et al. (2008) and Girardi et al. (2008))' ),
-    'aringer': ('aringer09', "Aringer et al. (2009) (Note: The interpolation scheme has been slightly improved w.r.t. to the paper's Fig. 19.")
+    'loidl': ('loidl01', 'Loidl et al. (2001) (as in Marigo et al. (2008) \
+and Girardi et al. (2008))'),
+    'aringer': ('aringer09', "Aringer et al. (2009) (Note: The interpolation \
+scheme has been slightly improved w.r.t. to the paper's Fig. 19.")
 }
 
 
@@ -145,7 +159,7 @@ map_circum_Cstars = {
     'nodustC': ('no dust', ''),
     'gra': ('Graphites', 'Bressan et al. (1998)'),
     'AMC': ('100% AMC', 'Groenewegen (2006)'),
-    'AMCSIC15': ('85% AMC + 15% SiC', 'Groenewegen (2006)' )
+    'AMCSIC15': ('85% AMC + 15% SiC', 'Groenewegen (2006)')
 }
 
 
@@ -161,7 +175,8 @@ def help_circumdust():
 map_isoc_val = {
     0: ('Single isochrone', ''),
     1: ('Sequence of isochrones at constant Z', ''),
-    2: ('Sequence of isochrones at constant t (variable Z)', 'Groenewegen (2006)')
+    2: ('Sequence of isochrones at constant t (variable Z)',
+        'Groenewegen (2006)')
 }
 
 
@@ -208,7 +223,6 @@ __def_args__ = {'binary_frac': 0.3,
                 'submit_form': 'Submit'}
 
 
-
 def file_type(filename, stream=False):
     """ Detect potential compressed file
     Returns the gz, bz2 or zip if a compression is detected, else None.
@@ -233,7 +247,8 @@ def file_type(filename, stream=False):
     return None
 
 
-def __get_url_args(model=None, carbon=None, interp=None, Mstars=None, Cstars=None, dust=None, phot=None):
+def __get_url_args(model=None, carbon=None, interp=None, Mstars=None,
+    Cstars=None, dust=None, phot=None):
     """ Update options in the URL query using internal shortcuts """
     d = __def_args__.copy()
 
