@@ -39,8 +39,8 @@ import urllib
 import urllib2
 import zlib
 import re
-from eztables import Table
-from StringIO import StringIO
+#from eztables import Table
+#from StringIO import StringIO
 
 # internal parameters
 # ---------------
@@ -300,14 +300,14 @@ def __query_website(d):
         raise RuntimeError('Server Response is incorrect')
 
 
-def __convert_to_Table(r, d=None):
-    """ Make a table from the string response content of the website """
-    bf = StringIO(r)
-    t = Table(bf, type='tsv')
-    if d is not None:
-        for k, v in d.items():
-            t.header[k] = v
-    return t
+#def __convert_to_Table(r, d=None):
+    #""" Make a table from the string response content of the website """
+    #bf = StringIO(r)
+    #t = Table(bf, type='tsv')
+    #if d is not None:
+        #for k, v in d.items():
+            #t.header[k] = v
+    #return t
 
 
 def get_one_isochrone(age, metal, ret_table=True, **kwargs):
@@ -338,10 +338,11 @@ def get_one_isochrone(age, metal, ret_table=True, **kwargs):
     d['isoc_zeta'] = metal
 
     r = __query_website(d)
-    if ret_table is True:
-        return __convert_to_Table(r, d)
-    else:
-        return r
+    #if ret_table is True:
+        #return __convert_to_Table(r, d)
+    #else:
+        #return r
+    return r
 
 
 def get_Z_isochrones(z0, z1, dz, age, ret_table=True, **kwargs):
@@ -378,10 +379,11 @@ def get_Z_isochrones(z0, z1, dz, age, ret_table=True, **kwargs):
     d['isoc_dz'] = dz
 
     r = __query_website(d)
-    if ret_table is True:
-        return __convert_to_Table(r, d)
-    else:
-        return r
+    #if ret_table is True:
+        #return __convert_to_Table(r, d)
+    #else:
+        #return r
+    return r
 
 
 def get_t_isochrones(logt0, logt1, dlogt, metal, ret_table=True, **kwargs):
@@ -418,14 +420,16 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, ret_table=True, **kwargs):
     d['isoc_dlage'] = dlogt
 
     r = __query_website(d)
-    if ret_table is True:
-        return __convert_to_Table(r, d)
-    else:
-        return r
+    #if ret_table is True:
+        #return __convert_to_Table(r, d)
+    #else:
+        #return r
+    return r
 
 
 r = get_t_isochrones(6.0, 7.0, 0.05, 0.02)
 import pylab as plt
+print r
 plt.scatter(r['logTe'], r['logL/Lo'], c=r['log(age/yr)'], edgecolor='None')
 print r['logL/Lo']
 plt.show()
