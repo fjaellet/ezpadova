@@ -1,23 +1,14 @@
-EZPADOVA 
-=========
+ezPADOVA-2
+==========
 
 A python package that allows you to download PADOVA/PARSEC isochrones directly
-from their website (http://stev.oapd.inaf.it/cgi-bin/cmd).
+from the [CMD](http://stev.oapd.inaf.it/cgi-bin/cmd) website.
 
-:version: 0.1dev
-:author: MF
-
-Requirements
--------------
-
-TODO list
---------
-* test with parsec 1.1 (currently working with cmd2.3/2.5)
-* make a full doc
-* cleanup the mess
+Fork of original [ezpadova](https://github.com/mfouesneau/ezpadova) code
+by [Morgan Fouesneau](https://github.com/mfouesneau)
 
 
-EXAMPLE USAGE
+Example usage
 -------------
 
 * Basic example of downloading a sequence of isochrones, plotting, saving
