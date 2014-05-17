@@ -35,6 +35,7 @@ import urllib
 import urllib2
 import zlib
 import re
+from os.path import join
 
 # internal parameters
 # ---------------
@@ -421,9 +422,17 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, ret_table=True, **kwargs):
     return r
 
 
-r = get_t_isochrones(6.0, 7.0, 0.05, 0.02)
-print r
+metal = 0.02
+r = get_t_isochrones(6.0, 7.0, 0.05, metal)
+#print r
 
+file_name = join('isochrones/' + ('%0.4f' % metal) + '.dat')
+print file_name
+
+with open(file_name, 'w') as f:
+    f.write(r)
+
+print 'Done.'
 #import pylab as plt
 #plt.scatter(r['logTe'], r['logL/Lo'], c=r['log(age/yr)'], edgecolor='None')
 #print r['logL/Lo']
