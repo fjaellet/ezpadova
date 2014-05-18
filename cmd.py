@@ -35,6 +35,7 @@ import urllib
 import urllib2
 import zlib
 import re
+import numpy as np
 from os.path import join
 
 # internal parameters
@@ -55,57 +56,57 @@ from os.path import join
     #'improved': 1
 #}
 
-map_phot = {"2mass_spitzer": " 2MASS + Spitzer (IRAC+MIPS)",
-            "2mass_spitzer_wise": " 2MASS + Spitzer (IRAC+MIPS) + WISE",
-            "2mass": " 2MASS JHKs",
-            "ubvrijhk": "UBVRIJHK (cf. Maiz-Apellaniz 2006 + Bessell 1990)",
-            "bessell": "UBVRIJHKLMN (cf. Bessell 1990 + Bessell & Brett 1988)",
-            "akari": "AKARI",
-            "batc": "BATC",
-            "megacam": "CFHT/Megacam u*g'r'i'z'",
-            "dcmc": "DCMC",
-            "denis": "DENIS",
-            "dmc14": "DMC 14 filters",
-            "dmc15": "DMC 15 filters",
-            "eis": "ESO/EIS (WFI UBVRIZ + SOFI JHK)",
-            "wfi": "ESO/WFI",
-            "wfi_sofi": "ESO/WFI+SOFI",
-            "wfi2": "ESO/WFI2",
-            "galex": "GALEX FUV+NUV (Vegamag) + Johnson's UBV",
-            "galex_sloan": "GALEX FUV+NUV + SDSS ugriz (all ABmags) ",
-            "UVbright": "HST+GALEX+Swift/UVOT UV filters",
-            "acs_hrc": "HST/ACS HRC",
-            "acs_wfc": "HST/ACS WFC",
-            "nicmosab": "HST/NICMOS AB",
-            "nicmosst": "HST/NICMOS ST",
-            "nicmosvega": "HST/NICMOS vega",
-            "stis": "HST/STIS imaging mode",
-            "wfc3ir": "HST/WFC3 IR channel (final throughputs)",
-            "wfc3uvis1": "HST/WFC3 UVIS channel, chip 1 (final throughputs)",
-            "wfc3uvis2": "HST/WFC3 UVIS channel, chip 2 (final throughputs)",
-            "wfc3_medium": "HST/WFC3 medium filters (UVIS1+IR, final \
-throughputs)",
-            "wfc3": "HST/WFC3 wide filters (UVIS1+IR, final throughputs)",
-            "wfpc2": "HST/WFPC2 (Vegamag, cf. Holtzman et al. 1995)",
-            "kepler": "Kepler + SDSS griz + DDO51 (in ABmags)",
-            "kepler_2mass": "Kepler + SDSS griz + DDO51 (in ABmags) + \
-2MASS (~Vegamag)",
-            "ogle": "OGLE-II",
-            "panstarrs1": "Pan-STARRS1",
-            "sloan": "SDSS ugriz",
-            "sloan_2mass": "SDSS ugriz + 2MASS JHKs",
-            "sloan_ukidss": "SDSS ugriz + UKIDSS ZYJHK",
-            "swift_uvot": "SWIFT/UVOT UVW2, UVM2, UVW1,u (Vegamag) ",
-            "spitzer": "Spitzer IRAC+MIPS",
-            "stroemgren": "Stroemgren-Crawford",
-            "suprimecam": "Subaru/Suprime-Cam (ABmags)",
-            "tycho2": "Tycho VTBT",
-            "ukidss": "UKIDSS ZYJHK (Vegamag)",
-            "visir": "VISIR",
-            "vista": "VISTA ZYJHKs (Vegamag)",
-            "washington": "Washington CMT1T2",
-            "washington_ddo51": "Washington CMT1T2 + DDO51"
-            }
+#map_phot = {"2mass_spitzer": " 2MASS + Spitzer (IRAC+MIPS)",
+            #"2mass_spitzer_wise": " 2MASS + Spitzer (IRAC+MIPS) + WISE",
+            #"2mass": " 2MASS JHKs",
+            #"ubvrijhk": "UBVRIJHK (cf. Maiz-Apellaniz 2006 + Bessell 1990)",
+            #"bessell": "UBVRIJHKLMN (cf. Bessell 1990 + Bessell & Brett 1988)",
+            #"akari": "AKARI",
+            #"batc": "BATC",
+            #"megacam": "CFHT/Megacam u*g'r'i'z'",
+            #"dcmc": "DCMC",
+            #"denis": "DENIS",
+            #"dmc14": "DMC 14 filters",
+            #"dmc15": "DMC 15 filters",
+            #"eis": "ESO/EIS (WFI UBVRIZ + SOFI JHK)",
+            #"wfi": "ESO/WFI",
+            #"wfi_sofi": "ESO/WFI+SOFI",
+            #"wfi2": "ESO/WFI2",
+            #"galex": "GALEX FUV+NUV (Vegamag) + Johnson's UBV",
+            #"galex_sloan": "GALEX FUV+NUV + SDSS ugriz (all ABmags) ",
+            #"UVbright": "HST+GALEX+Swift/UVOT UV filters",
+            #"acs_hrc": "HST/ACS HRC",
+            #"acs_wfc": "HST/ACS WFC",
+            #"nicmosab": "HST/NICMOS AB",
+            #"nicmosst": "HST/NICMOS ST",
+            #"nicmosvega": "HST/NICMOS vega",
+            #"stis": "HST/STIS imaging mode",
+            #"wfc3ir": "HST/WFC3 IR channel (final throughputs)",
+            #"wfc3uvis1": "HST/WFC3 UVIS channel, chip 1 (final throughputs)",
+            #"wfc3uvis2": "HST/WFC3 UVIS channel, chip 2 (final throughputs)",
+            #"wfc3_medium": "HST/WFC3 medium filters (UVIS1+IR, final \
+#throughputs)",
+            #"wfc3": "HST/WFC3 wide filters (UVIS1+IR, final throughputs)",
+            #"wfpc2": "HST/WFPC2 (Vegamag, cf. Holtzman et al. 1995)",
+            #"kepler": "Kepler + SDSS griz + DDO51 (in ABmags)",
+            #"kepler_2mass": "Kepler + SDSS griz + DDO51 (in ABmags) + \
+#2MASS (~Vegamag)",
+            #"ogle": "OGLE-II",
+            #"panstarrs1": "Pan-STARRS1",
+            #"sloan": "SDSS ugriz",
+            #"sloan_2mass": "SDSS ugriz + 2MASS JHKs",
+            #"sloan_ukidss": "SDSS ugriz + UKIDSS ZYJHK",
+            #"swift_uvot": "SWIFT/UVOT UVW2, UVM2, UVW1,u (Vegamag) ",
+            #"spitzer": "Spitzer IRAC+MIPS",
+            #"stroemgren": "Stroemgren-Crawford",
+            #"suprimecam": "Subaru/Suprime-Cam (ABmags)",
+            #"tycho2": "Tycho VTBT",
+            #"ukidss": "UKIDSS ZYJHK (Vegamag)",
+            #"visir": "VISIR",
+            #"vista": "VISTA ZYJHKs (Vegamag)",
+            #"washington": "Washington CMT1T2",
+            #"washington_ddo51": "Washington CMT1T2 + DDO51"
+            #}
 
 #available tracks
 #map_models = {
@@ -189,7 +190,6 @@ __def_args__ = {'binary_frac': 0.3,
                 'isoc_age0': 12.7e9,
                 'isoc_dlage': 0.05,
                 'isoc_dz': 0.0001,
-                #'isoc_kind': 'gi10a',
                 'isoc_kind': 'parsec_CAF09_v1.1',
                 'isoc_lage0': 6.6,
                 'isoc_lage1': 10.13,
@@ -278,7 +278,7 @@ def __query_website(d):
     Communicate with the CMD website.
     """
     webserver = 'http://stev.oapd.inaf.it'
-    print('Interrogating {0}...'.format(webserver))
+    print('  Interrogating {0}...'.format(webserver))
     q = urllib.urlencode(d)
     #print('Query content: {0}'.format(q))
     c = urllib2.urlopen(webserver + '/cgi-bin/cmd_2.5', q).read()
@@ -286,7 +286,7 @@ def __query_website(d):
     fname = aa.findall(c)
     if len(fname) > 0:
         url = '{0}/~lgirardi/tmp/{1}.dat'.format(webserver, fname[0])
-        print('Downloading data...{0}'.format(url))
+        print('  Downloading data...{0}'.format(url))
         bf = urllib2.urlopen(url)
         r = bf.read()
         typ = file_type(r, stream=True)
@@ -295,7 +295,7 @@ def __query_website(d):
         return r
     else:
         print c
-        raise RuntimeError('Server Response is incorrect')
+        raise RuntimeError('FATAL: Server Response is incorrect')
 
 
 #def __convert_to_Table(r, d=None):
@@ -424,14 +424,18 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, ret_table=True, **kwargs):
         #return r
     return r
 
+# Run for a range in metallicity.
+for metal in np.arange(0.0005, 0.03, 0.01):
 
-metal = 0.02
-r = get_t_isochrones(6.0, 10.13, 0.05, metal, phot='ubvrijhk')
+    # Call function to get isochrones.
+    r = get_t_isochrones(6.0, 10.13, 0.05, metal, phot='2mass')
 
-file_name = join('isochrones/' + ('%0.4f' % metal) + '.dat')
-print file_name
+    # Define file name according to metallicity value.
+    file_name = join('isochrones/' + ('%0.4f' % metal) + '.dat')
+    print file_name
 
-with open(file_name, 'w') as f:
-    f.write(r)
+    # Store in file.
+    with open(file_name, 'w') as f:
+        f.write(r)
 
-print 'Done.'
+print '\nDone.'
