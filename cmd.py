@@ -242,7 +242,7 @@ def file_type(filename, stream=False):
 
 
 def __get_url_args(model=None, carbon=None, interp=None, Mstars=None,
-    Cstars=None, dust=None, phot=None):
+    Cstars=None, dust=None, tracks=None, phot=None):
     """
     Update options in the URL query using internal shortcuts.
     """
@@ -266,6 +266,9 @@ def __get_url_args(model=None, carbon=None, interp=None, Mstars=None,
 
     #if Mstars is not None:
         #d['dust_source'] = map_circum_Mstars[Mstars]
+
+    if tracks is not None:
+        d['isoc_kind'] = tracks
 
     if phot is not None:
         d['photsys_file'] = 'tab_mag_odfnew/tab_mag_{0}.dat'.format(phot)
@@ -425,10 +428,15 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, ret_table=True, **kwargs):
     return r
 
 # Run for a range in metallicity.
-for metal in np.arange(0.0005, 0.03, 0.01):
+for metal in np.arange(0.03, 0.031, 0.0005):
+
+    # Evolutionary tracks.
+    evol_trck = 'parsec_CAF09_v1.2S'
+    phot_syst = '2mass'
 
     # Call function to get isochrones.
-    r = get_t_isochrones(6.0, 10.13, 0.05, metal, phot='2mass')
+    r = get_t_isochrones(6.0, 10.13, 0.05, metal, tracks=evol_trck,
+    phot=phot_syst)
 
     # Define file name according to metallicity value.
     file_name = join('isochrones/' + ('%0.4f' % metal) + '.dat')
