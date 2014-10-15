@@ -433,7 +433,7 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, **kwargs):
     return r
 
 # Run for a range in metallicity.
-for metal in np.arange(0.03, 0.031, 0.005):
+for metal in np.arange(0.0005, 0.031, 0.0005):
 
     # Evolutionary tracks.
     evol_trck = 'parsec_CAF09_v1.2S'
