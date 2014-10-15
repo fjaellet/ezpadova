@@ -190,15 +190,15 @@ __def_args__ = {'binary_frac': 0.3,
                 'isoc_age0': 12.7e9,
                 'isoc_dlage': 0.05,
                 'isoc_dz': 0.0001,
-                'isoc_kind': 'parsec_CAF09_v1.1',
+                'isoc_kind': 'parsec_CAF09_v1.2S',
                 'isoc_lage0': 6.6,
                 'isoc_lage1': 10.13,
-                'isoc_val': 0,
+                'isoc_val': 1,
                 'isoc_z0': 0.0001,
                 'isoc_z1': 0.03,
                 'isoc_zeta': 0.02,
                 'isoc_zeta0': 0.008,
-                'kind_cspecmag': 'loidl01',
+                'kind_cspecmag': 'aringer09',
                 'kind_dust': 0,
                 'kind_interp': 1,
                 'kind_mag': 2,
@@ -214,6 +214,7 @@ __def_args__ = {'binary_frac': 0.3,
                 'output_gzip': 0,
                 'output_kind': 0,
                 'photsys_file': 'tab_mag_odfnew/tab_mag_bessell.dat',
+                'photosys_version': 'yang',
                 'submit_form': 'Submit'}
 
 
@@ -280,11 +281,15 @@ def __query_website(d):
     """
     Communicate with the CMD website.
     """
+
+    # CMD version.
+    cmd_v = '2.6'
+
     webserver = 'http://stev.oapd.inaf.it'
     print('  Interrogating {0}...'.format(webserver))
     q = urllib.urlencode(d)
     #print('Query content: {0}'.format(q))
-    c = urllib2.urlopen(webserver + '/cgi-bin/cmd_2.5', q).read()
+    c = urllib2.urlopen(webserver + '/cgi-bin/cmd_' + cmd_v, q).read()
     aa = re.compile('output\d+')
     fname = aa.findall(c)
     if len(fname) > 0:
@@ -387,7 +392,7 @@ def get_Z_isochrones(z0, z1, dz, age, ret_table=True, **kwargs):
     return r
 
 
-def get_t_isochrones(logt0, logt1, dlogt, metal, ret_table=True, **kwargs):
+def get_t_isochrones(logt0, logt1, dlogt, metal, **kwargs):
     """ get a sequence of isochrones at constant Z
     INPUTS
     ------
@@ -428,11 +433,11 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, ret_table=True, **kwargs):
     return r
 
 # Run for a range in metallicity.
-for metal in np.arange(0.03, 0.031, 0.0005):
+for metal in np.arange(0.03, 0.031, 0.005):
 
     # Evolutionary tracks.
     evol_trck = 'parsec_CAF09_v1.2S'
-    phot_syst = '2mass'
+    phot_syst = 'ubvrijhk'
 
     # Call function to get isochrones.
     r = get_t_isochrones(6.0, 10.13, 0.05, metal, tracks=evol_trck,
