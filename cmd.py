@@ -7,15 +7,6 @@ webpage (http://stev.oapd.inaf.it/cgi-bin/cmd).
 It compiles the URL needed to query the website and retrives the data into a
 python variable.
 
-:version: 0.1dev
-:author: MF
-
-TODO list
---------
-* test with parsec 1.1 (currently working with cmd2.3)
-* make a full doc
-* cleanup the mess
-
 EXAMPLE USAGE
 -------------
 
@@ -37,12 +28,6 @@ import zlib
 import re
 import numpy as np
 from os.path import join
-
-# internal parameters
-# ---------------
-#map_cmd_version = {
-    #2.3: ('2.3', "Old version of the models, before PARSEC")
-#}
 
 
 #def help_cmd_version():
@@ -178,7 +163,7 @@ __def_args__ = {'binary_frac': 0.3,
                 'binary_kind': 1,
                 'binary_mrinf': 0.7,
                 'binary_mrsup': 1,
-                'cmd_version': 2.5,
+                'cmd_version': 2.6,
                 'dust_source': 'nodust',
                 'dust_sourceC': 'nodustC',
                 'dust_sourceM': 'nodustM',
@@ -306,18 +291,10 @@ def __query_website(d):
         raise RuntimeError('FATAL: Server Response is incorrect')
 
 
-#def __convert_to_Table(r, d=None):
-    #""" Make a table from the string response content of the website """
-    #bf = StringIO(r)
-    #t = Table(bf, type='tsv')
-    #if d is not None:
-        #for k, v in d.items():
-            #t.header[k] = v
-    #return t
-
-
 def get_one_isochrone(age, metal, ret_table=True, **kwargs):
-    """ get one isochrone at a given time and Z
+    """
+    Get one isochrone at a given time and Z.
+
     INPUTS
     ------
     age: float
@@ -327,9 +304,6 @@ def get_one_isochrone(age, metal, ret_table=True, **kwargs):
 
     KEYWORDS
     --------
-    ret_table: bool
-        if set, return a eztable.Table object of the data
-
     **kwargs updates the web query
 
     OUTPUTS
@@ -344,15 +318,14 @@ def get_one_isochrone(age, metal, ret_table=True, **kwargs):
     d['isoc_zeta'] = metal
 
     r = __query_website(d)
-    #if ret_table is True:
-        #return __convert_to_Table(r, d)
-    #else:
-        #return r
+
     return r
 
 
 def get_Z_isochrones(z0, z1, dz, age, ret_table=True, **kwargs):
-    """ get a sequence of isochrones at constant time but variable Z
+    """
+    Get a sequence of isochrones at constant time but variable Z.
+
     INPUTS
     ------
     z0: float
@@ -366,16 +339,12 @@ def get_Z_isochrones(z0, z1, dz, age, ret_table=True, **kwargs):
 
     KEYWORDS
     --------
-    ret_table: bool
-        if set, return a eztable.Table object of the data
-
     **kwargs updates the web query
 
     OUTPUTS
     -------
-    r: Table or str
-        if ret_table is set, return a eztable.Table object of the data
-        else return the string content of the data
+    r: str
+       Return the string content of the data
     """
     d = __get_url_args(**kwargs)
     d['isoc_val'] = 2
@@ -385,15 +354,14 @@ def get_Z_isochrones(z0, z1, dz, age, ret_table=True, **kwargs):
     d['isoc_dz'] = dz
 
     r = __query_website(d)
-    #if ret_table is True:
-        #return __convert_to_Table(r, d)
-    #else:
-        #return r
+
     return r
 
 
-def get_t_isochrones(logt0, logt1, dlogt, metal, **kwargs):
-    """ get a sequence of isochrones at constant Z
+def get_t_isochrones(log_vals, metal, **kwargs):
+    """
+    Get a sequence of isochrones at constant Z.
+
     INPUTS
     ------
     logt0: float
@@ -403,21 +371,20 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, **kwargs):
     dlogt: float
         step in log(t/yr) for the sequence
     metal: float
-        metallicity value to use (Zsun=0.019)
+        metallicity (z) value to use
 
     KEYWORDS
     --------
-    ret_table: bool
-        if set, return a eztable.Table object of the data
-
     **kwargs updates the web query
 
     OUTPUTS
     -------
-    r: Table or str
-        if ret_table is set, return a eztable.Table object of the data
-        else return the string content of the data
+    r: str
+       Return the string content of the data
     """
+
+    logt0, logt1, dlogt = log_vals
+
     d = __get_url_args(**kwargs)
     d['isoc_val'] = 1
     d['isoc_zeta0'] = metal
@@ -426,29 +393,66 @@ def get_t_isochrones(logt0, logt1, dlogt, metal, **kwargs):
     d['isoc_dlage'] = dlogt
 
     r = __query_website(d)
-    #if ret_table is True:
-        #return __convert_to_Table(r, d)
-    #else:
-        #return r
+
     return r
 
-# Run for a range in metallicity.
-for metal in np.arange(0.0005, 0.031, 0.0005):
 
-    # Evolutionary tracks.
-    evol_trck = 'parsec_CAF09_v1.2S'
-    phot_syst = 'ubvrijhk'
+def read_params():
+    '''
+    Read input parameters from file.
+    '''
 
+    # Accept these variations of the 'true' flag.
+    true_lst = ('True', 'true', 'TRUE')
+
+    with open('in_params.dat', 'r') as f:
+        # Iterate through each line in the file.
+        for line in f:
+
+            if not line.startswith("#") and line.strip() != '':
+                reader = line.split()
+
+                # Tracks.
+                if reader[0] == 'ET':
+                    evol_track = str(reader[1])
+
+                # Photometric system.
+                if reader[0] == 'PS':
+                    phot_syst = str(reader[1])
+
+                # Metallicity range/values.
+                if reader[0] == 'MR':
+                    z_vals = map(float, reader[1:4])
+                    z_range = np.arange(*z_vals)
+                if reader[0] == 'MV':
+                    if reader[1] in true_lst:
+                        z_range = map(float, reader[2:])
+
+                # Age range.
+                if reader[0] == 'AR':
+                    a_vals = map(float, reader[1:4])
+
+    return evol_track, phot_syst, z_range, a_vals
+
+
+# Read input parameters from file.
+evol_track, phot_syst, z_range, a_vals = read_params()
+
+print 'CMD v2.6\n'
+
+# Run for given range in metallicity.
+for metal in z_range:
+
+    print 'z = {}'.format(metal)
     # Call function to get isochrones.
-    r = get_t_isochrones(6.0, 10.13, 0.05, metal, tracks=evol_trck,
+    r = get_t_isochrones(a_vals, metal, tracks=evol_track,
     phot=phot_syst)
 
     # Define file name according to metallicity value.
     file_name = join('isochrones/' + ('%0.4f' % metal) + '.dat')
-    print file_name
 
     # Store in file.
     with open(file_name, 'w') as f:
         f.write(r)
 
-print '\nDone.'
+print '\nAll done.'
