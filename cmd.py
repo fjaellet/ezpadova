@@ -6,20 +6,6 @@ This small package provides a direct interface to the PADOVA/PARSEC isochrone
 webpage (http://stev.oapd.inaf.it/cgi-bin/cmd).
 It compiles the URL needed to query the website and retrives the data into a
 python variable.
-
-EXAMPLE USAGE
--------------
-
-#Basic example of downloading a sequence of isochrones, plotting, saving
->>> r = get_cmd.get_t_isochrones(6.0, 7.0, 0.05, 0.02)
->>> import pylab as plt
->>> plt.scatter(r['logTe'], r['logL/Lo'], c=r['log(age/yr)'], edgecolor='None')
->>> plt.show()
->>> r.write('myiso.fits')
-
-# getting only one isochrone
->>> r = get_cmd.get_one_isochrones(1e7, 0.02, phot='spitzer')
-
 """
 
 import urllib
@@ -29,135 +15,17 @@ import re
 import numpy as np
 from os.path import join
 
-
-#def help_cmd_version():
-    #for k, v in map_cmd_version.items():
-        #print 'cmd "{0}":\n   {1}\n'.format(k, v[1])
-
-
-#interpolation
-#map_interp = {
-    #'default': 0,
-    #'improved': 1
-#}
-
-#map_phot = {"2mass_spitzer": " 2MASS + Spitzer (IRAC+MIPS)",
-            #"2mass_spitzer_wise": " 2MASS + Spitzer (IRAC+MIPS) + WISE",
-            #"2mass": " 2MASS JHKs",
-            #"ubvrijhk": "UBVRIJHK (cf. Maiz-Apellaniz 2006 + Bessell 1990)",
-            #"bessell": "UBVRIJHKLMN (cf. Bessell 1990 + Bessell & Brett 1988)",
-            #"akari": "AKARI",
-            #"batc": "BATC",
-            #"megacam": "CFHT/Megacam u*g'r'i'z'",
-            #"dcmc": "DCMC",
-            #"denis": "DENIS",
-            #"dmc14": "DMC 14 filters",
-            #"dmc15": "DMC 15 filters",
-            #"eis": "ESO/EIS (WFI UBVRIZ + SOFI JHK)",
-            #"wfi": "ESO/WFI",
-            #"wfi_sofi": "ESO/WFI+SOFI",
-            #"wfi2": "ESO/WFI2",
-            #"galex": "GALEX FUV+NUV (Vegamag) + Johnson's UBV",
-            #"galex_sloan": "GALEX FUV+NUV + SDSS ugriz (all ABmags) ",
-            #"UVbright": "HST+GALEX+Swift/UVOT UV filters",
-            #"acs_hrc": "HST/ACS HRC",
-            #"acs_wfc": "HST/ACS WFC",
-            #"nicmosab": "HST/NICMOS AB",
-            #"nicmosst": "HST/NICMOS ST",
-            #"nicmosvega": "HST/NICMOS vega",
-            #"stis": "HST/STIS imaging mode",
-            #"wfc3ir": "HST/WFC3 IR channel (final throughputs)",
-            #"wfc3uvis1": "HST/WFC3 UVIS channel, chip 1 (final throughputs)",
-            #"wfc3uvis2": "HST/WFC3 UVIS channel, chip 2 (final throughputs)",
-            #"wfc3_medium": "HST/WFC3 medium filters (UVIS1+IR, final \
-#throughputs)",
-            #"wfc3": "HST/WFC3 wide filters (UVIS1+IR, final throughputs)",
-            #"wfpc2": "HST/WFPC2 (Vegamag, cf. Holtzman et al. 1995)",
-            #"kepler": "Kepler + SDSS griz + DDO51 (in ABmags)",
-            #"kepler_2mass": "Kepler + SDSS griz + DDO51 (in ABmags) + \
-#2MASS (~Vegamag)",
-            #"ogle": "OGLE-II",
-            #"panstarrs1": "Pan-STARRS1",
-            #"sloan": "SDSS ugriz",
-            #"sloan_2mass": "SDSS ugriz + 2MASS JHKs",
-            #"sloan_ukidss": "SDSS ugriz + UKIDSS ZYJHK",
-            #"swift_uvot": "SWIFT/UVOT UVW2, UVM2, UVW1,u (Vegamag) ",
-            #"spitzer": "Spitzer IRAC+MIPS",
-            #"stroemgren": "Stroemgren-Crawford",
-            #"suprimecam": "Subaru/Suprime-Cam (ABmags)",
-            #"tycho2": "Tycho VTBT",
-            #"ukidss": "UKIDSS ZYJHK (Vegamag)",
-            #"visir": "VISIR",
-            #"vista": "VISTA ZYJHKs (Vegamag)",
-            #"washington": "Washington CMT1T2",
-            #"washington_ddo51": "Washington CMT1T2 + DDO51"
-            #}
-
 #available tracks
-#map_models = {
-    #'2010': ('gi10a', 'Marigo et al. (2008) with the Girardi et al. (2010) \
-#Case A correction for low-mass, low-metallicity AGB tracks'),
-    #'2010b': ('gi10b', 'Marigo et al. (2008) with the Girardi et al. (2010) \
-#Case B correction for low-mass, low-metallicity AGB tracks'),
-    #'2008': ('ma08', 'Marigo et al. (2008): Girardi et al. (2000) up to \
-#early-AGB + detailed TP-AGB from Marigo & Girardi (2007) (for M <= 7 Msun) \
-#Bertelli et al. (1994) (for M > 7 Msun) + additional Z=0.0001 and Z=0.001 \
-#tracks.'),
-    #'2002': ('gi2000', 'Basic set of Girardi et al. (2002) : Girardi et al. \
-#(2000) + simplified TP-AGB (for M <= 7 Msun) + Bertelli et al. (1994) \
-#(for M > 7 Msun) + additional Z=0.0001 and Z=0.001 tracks.')
-#}
+map_models = {
+    'PA12S': ('parsec_CAF09_v1.2S', 'PARSEC version 1.2S'),
+    'PA11': ('parsec_CAF09_v1.1', 'PARSEC version 1.1'),
+    'PA10': ('parsec_CAF09_v1.0', 'PARSEC version 1.0'),
+    '2010': ('gi10a', 'Marigo et al. (2008) + Girardi et al. (2010); (Case A)'),
+    '2010b': ('gi10b', 'Marigo et al. (2008) + Girardi et al. (2010); (Case B)'),
+    '2008': ('ma08', 'Marigo et al. (2008)'),
+    '2002': ('gi2000', 'Basic set of Girardi et al. (2002)')
+}
 
-
-#def help_models():
-    #for k, v in map_models.items():
-        #print 'model "{0}":\n   {1}\n'.format(k, v[1])
-
-
-#map_carbon_stars = {
-    #'loidl': ('loidl01', 'Loidl et al. (2001) (as in Marigo et al. (2008) \
-#and Girardi et al. (2008))'),
-    #'aringer': ('aringer09', "Aringer et al. (2009) (Note: The interpolation \
-#scheme has been slightly improved w.r.t. to the paper's Fig. 19.")
-#}
-
-
-#def help_carbon_stars():
-    #for k, v in map_carbon_stars.items():
-        #print 'model "{0}":\n   {1}\n'.format(k, v[1])
-
-#circumstellar dust
-#map_circum_Mstars = {
-    #'nodustM': ('no dust', ''),
-    #'sil': ('Silicates', 'Bressan et al. (1998)'),
-    #'AlOx': ('100% AlOx', 'Groenewegen (2006)'),
-    #'dpmod60alox40': ('60% Silicate + 40% AlOx', 'Groenewegen (2006)'),
-    #'dpmod': ('100% Silicate', 'Groenewegen (2006)')
-#}
-
-#map_circum_Cstars = {
-    #'nodustC': ('no dust', ''),
-    #'gra': ('Graphites', 'Bressan et al. (1998)'),
-    #'AMC': ('100% AMC', 'Groenewegen (2006)'),
-    #'AMCSIC15': ('85% AMC + 15% SiC', 'Groenewegen (2006)')
-#}
-
-
-#def help_circumdust():
-    #print 'M stars'
-    #for k, v in map_circum_Mstars.items():
-        #print 'model "{0}":\n   {1}\n'.format(k, v[1])
-    #print 'C stars'
-    #for k, v in map_circum_Cstars.items():
-        #print 'model "{0}":\n   {1}\n'.format(k, v[1])
-
-
-#map_isoc_val = {
-    #0: ('Single isochrone', ''),
-    #1: ('Sequence of isochrones at constant Z', ''),
-    #2: ('Sequence of isochrones at constant t (variable Z)',
-        #'Groenewegen (2006)')
-#}
 
 __def_args__ = {'binary_frac': 0.3,
                 'binary_kind': 1,
@@ -226,35 +94,58 @@ def file_type(filename, stream=False):
 
     return None
 
+#map_carbon_stars = {
+    #'loidl': ('loidl01', 'Loidl et al. (2001) (as in Marigo et al. (2008) \
+#and Girardi et al. (2008))'),
+    #'aringer': ('aringer09', "Aringer et al. (2009) (Note: The interpolation \
+#scheme has been slightly improved w.r.t. to the paper's Fig. 19.")
+#}
+
+#map_interp = {
+    #'default': 0,
+    #'improved': 1
+#}
+
+#map_circum_Mstars = {
+    #'nodustM': ('no dust', ''),
+    #'sil': ('Silicates', 'Bressan et al. (1998)'),
+    #'AlOx': ('100% AlOx', 'Groenewegen (2006)'),
+    #'dpmod60alox40': ('60% Silicate + 40% AlOx', 'Groenewegen (2006)'),
+    #'dpmod': ('100% Silicate', 'Groenewegen (2006)')
+#}
+
+#map_circum_Cstars = {
+    #'nodustC': ('no dust', ''),
+    #'gra': ('Graphites', 'Bressan et al. (1998)'),
+    #'AMC': ('100% AMC', 'Groenewegen (2006)'),
+    #'AMCSIC15': ('85% AMC + 15% SiC', 'Groenewegen (2006)')
+#}
 
 def __get_url_args(model=None, carbon=None, interp=None, Mstars=None,
-    Cstars=None, dust=None, tracks=None, phot=None):
+    Cstars=None, dust=None, phot=None):
     """
     Update options in the URL query using internal shortcuts.
     """
     d = __def_args__.copy()
 
-    #overwrite some parameters
-    #if model is not None:
-        #d['isoc_kind'] = map_models["%s" % model][0]
+    # overwrite some parameters
+    if model is not None:
+        d['isoc_kind'] = map_models["%s" % model][0]
 
-    #if carbon is not None:
-        #d['kind_cspecmag'] = map_carbon_stars[carbon][0]
+    # if carbon is not None:
+    #     d['kind_cspecmag'] = map_carbon_stars[carbon][0]
 
-    #if interp is not None:
-        #d['kind_interp'] = map_interp[interp]
+    # if interp is not None:
+    #     d['kind_interp'] = map_interp[interp]
 
-    #if dust is not None:
-        #d['dust_source'] = map_circum_Mstars[dust]
+    # if dust is not None:
+    #     d['dust_source'] = map_circum_Mstars[dust]
 
-    #if Cstars is not None:
-        #d['dust_source'] = map_circum_Cstars[Cstars]
+    # if Cstars is not None:
+    #     d['dust_source'] = map_circum_Cstars[Cstars]
 
-    #if Mstars is not None:
-        #d['dust_source'] = map_circum_Mstars[Mstars]
-
-    if tracks is not None:
-        d['isoc_kind'] = tracks
+    # if Mstars is not None:
+    #     d['dust_source'] = map_circum_Mstars[Mstars]
 
     if phot is not None:
         d['photsys_file'] = 'tab_mag_odfnew/tab_mag_{0}.dat'.format(phot)
@@ -267,14 +158,11 @@ def __query_website(d):
     Communicate with the CMD website.
     """
 
-    # CMD version.
-    cmd_v = '2.6'
-
     webserver = 'http://stev.oapd.inaf.it'
     print('  Interrogating {0}...'.format(webserver))
     q = urllib.urlencode(d)
-    #print('Query content: {0}'.format(q))
-    c = urllib2.urlopen(webserver + '/cgi-bin/cmd_' + cmd_v, q).read()
+    # print('Query content: {0}'.format(q))
+    c = urllib2.urlopen(webserver + '/cgi-bin/cmd', q).read()
     aa = re.compile('output\d+')
     fname = aa.findall(c)
     if len(fname) > 0:
@@ -289,73 +177,6 @@ def __query_website(d):
     else:
         print c
         raise RuntimeError('FATAL: Server Response is incorrect')
-
-
-def get_one_isochrone(age, metal, ret_table=True, **kwargs):
-    """
-    Get one isochrone at a given time and Z.
-
-    INPUTS
-    ------
-    age: float
-        age of the isochrone (in yr)
-    metal: float
-        metalicity of the isochrone
-
-    KEYWORDS
-    --------
-    **kwargs updates the web query
-
-    OUTPUTS
-    -------
-    r: Table or str
-        if ret_table is set, return a eztable.Table object of the data
-        else return the string content of the data
-    """
-    d = __get_url_args(**kwargs)
-    d['isoc_val'] = 0
-    d['isoc_age'] = age
-    d['isoc_zeta'] = metal
-
-    r = __query_website(d)
-
-    return r
-
-
-def get_Z_isochrones(z0, z1, dz, age, ret_table=True, **kwargs):
-    """
-    Get a sequence of isochrones at constant time but variable Z.
-
-    INPUTS
-    ------
-    z0: float
-        minimal value of Z
-    z11: float
-        maximal value of Z
-    dz: float
-        step in Z
-    age: float
-        age of the sequence (in yr)
-
-    KEYWORDS
-    --------
-    **kwargs updates the web query
-
-    OUTPUTS
-    -------
-    r: str
-       Return the string content of the data
-    """
-    d = __get_url_args(**kwargs)
-    d['isoc_val'] = 2
-    d['isoc_age0'] = age
-    d['isoc_z0'] = z0
-    d['isoc_z1'] = z1
-    d['isoc_dz'] = dz
-
-    r = __query_website(d)
-
-    return r
 
 
 def get_t_isochrones(log_vals, metal, **kwargs):
@@ -438,14 +259,14 @@ def read_params():
 # Read input parameters from file.
 evol_track, phot_syst, z_range, a_vals = read_params()
 
-print 'CMD v2.6\n'
+print 'Query CMD using: {}.\n'.format(map_models["%s" % evol_track][1])
 
 # Run for given range in metallicity.
 for metal in z_range:
 
     print 'z = {}'.format(metal)
     # Call function to get isochrones.
-    r = get_t_isochrones(a_vals, metal, tracks=evol_track,
+    r = get_t_isochrones(a_vals, metal, model=evol_track,
     phot=phot_syst)
 
     # Define file name according to metallicity value.

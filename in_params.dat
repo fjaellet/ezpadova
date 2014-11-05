@@ -5,7 +5,15 @@
 
 # Evolutionary tracks.
 #
-ET   parsec_CAF09_v1.2S
+# PA12S <-- PARSEC v1.2S 
+# PA11  <-- PARSEC v1.1
+# PA10  <-- PARSEC v1.0
+# 2010  <-- Marigo et al. (2008) + Girardi et al. (2010)
+# 2010b <-- as above but for Case B 
+# 2008  <-- Marigo et al. (2008)
+# 2002  <-- Basic set of Girardi et al. (2002)
+#
+ET   PA12S
 
 # Photometric system.
 #
