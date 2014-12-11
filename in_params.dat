@@ -13,7 +13,7 @@
 # 2008  <-- Marigo et al. (2008)
 # 2002  <-- Basic set of Girardi et al. (2002)
 #
-ET   PA12S
+ET   PA10
 
 # Photometric system.
 #
@@ -30,7 +30,7 @@ MR      0.0001    0.06    0.005
 # values separated by spaces.
 #
 #     flag    vals
-MV   false    0.001 0.013 0.05
+MV   false    0.000152  0.00027
 
 
 # log(age) range.

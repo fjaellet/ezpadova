@@ -270,7 +270,7 @@ for metal in z_range:
     phot=phot_syst)
 
     # Define file name according to metallicity value.
-    file_name = join('isochrones/' + ('%0.4f' % metal) + '.dat')
+    file_name = join('isochrones/' + ('%0.6f' % metal) + '.dat')
 
     # Store in file.
     with open(file_name, 'w') as f:
