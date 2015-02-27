@@ -13,13 +13,14 @@ import urllib2
 import zlib
 import re
 import numpy as np
-from os.path import join
+from os.path import join, exists
+from os import makedirs
 
 #available tracks
 map_models = {
-    'PA12S': ('parsec_CAF09_v1.2S', 'PARSEC version 1.2S'),
-    'PA11': ('parsec_CAF09_v1.1', 'PARSEC version 1.1'),
-    'PA10': ('parsec_CAF09_v1.0', 'PARSEC version 1.0'),
+    'PAR12': ('parsec_CAF09_v1.2S', 'PARSEC version 1.2S'),
+    'PAR11': ('parsec_CAF09_v1.1', 'PARSEC version 1.1'),
+    'PAR10': ('parsec_CAF09_v1.0', 'PARSEC version 1.0'),
     '2010': ('gi10a', 'Marigo et al. (2008) + Girardi et al. (2010); (Case A)'),
     '2010b': ('gi10b', 'Marigo et al. (2008) + Girardi et al. (2010); (Case B)'),
     '2008': ('ma08', 'Marigo et al. (2008)'),
@@ -256,24 +257,49 @@ def read_params():
     return evol_track, phot_syst, z_range, a_vals
 
 
-# Read input parameters from file.
-evol_track, phot_syst, z_range, a_vals = read_params()
+def main():
 
-print 'Query CMD using: {}.\n'.format(map_models["%s" % evol_track][1])
+    # Read input parameters from file.
+    evol_track, phot_syst, z_range, a_vals = read_params()
 
-# Run for given range in metallicity.
-for metal in z_range:
+    # Sub-folder where isochrone files will be stored.
+    if evol_track[:3] == 'PAR':
+        sf_0 = 'parsec'
+        sf_1 = evol_track[-2:]
+    else:
+        sf_0 = 'mar'
+        sf_1 = evol_track
 
-    print 'z = {}'.format(metal)
-    # Call function to get isochrones.
-    r = get_t_isochrones(a_vals, metal, model=evol_track,
-    phot=phot_syst)
+    if phot_syst == 'ubvrijhk':
+        sf_2 = '_ubvi/'
+    else:
+        sf_2 = '_syst/'
+    sub_folder = sf_0 + sf_1 + sf_2
 
-    # Define file name according to metallicity value.
-    file_name = join('isochrones/' + ('%0.6f' % metal) + '.dat')
+    # If the sub-folder doesn't exist, create it before moving the file.
+    full_path = 'isochrones/' + sub_folder
+    if not exists(full_path):
+        makedirs(full_path)
 
-    # Store in file.
-    with open(file_name, 'w') as f:
-        f.write(r)
+    print 'Query CMD using: {}.\n'.format(map_models["%s" % evol_track][1])
 
-print '\nAll done.'
+    # Run for given range in metallicity.
+    for metal in z_range:
+
+        print 'z = {}'.format(metal)
+        # Call function to get isochrones.
+        r = get_t_isochrones(a_vals, metal, model=evol_track,
+        phot=phot_syst)
+
+        # Define file name according to metallicity value.
+        file_name = join(full_path + ('%0.6f' % metal) + '.dat')
+
+        # Store in file.
+        with open(file_name, 'w') as f:
+            f.write(r)
+
+    print '\nAll done.'
+
+
+if __name__ == "__main__":
+    main()
