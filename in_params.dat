@@ -15,15 +15,14 @@
 #
 ET   PAR12
 
-# Photometric system.
+# Photometric system (get name from README file).
 #
 PS   ubvrijhk
-
 
 # Metallicity (z) range.
 #
 #       z_min    z_max    z_step
-MR      0.0001    0.03    0.0001
+MR      0.0005    0.03    0.0005
 
 # Alternatively, download these fixed metallicity values
 # instead of a range. Set flag to 'true' and input as
@@ -31,7 +30,7 @@ MR      0.0001    0.03    0.0001
 # separated by spaces.
 #
 #     flag    vals
-MV   false    0.000152  0.00027
+MV   false    0.03
 
 # log(age) range.
 #
