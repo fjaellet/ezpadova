@@ -270,18 +270,16 @@ def main():
         sf_0 = 'mar'
         sf_1 = evol_track
 
-    if phot_syst == 'ubvrijhk':
-        sf_2 = '_ubvi/'
-    else:
-        sf_2 = '_syst/'
-    sub_folder = sf_0 + sf_1 + sf_2
+    # Define sub-folder's name.
+    sub_folder = sf_0 + sf_1 + '_' + phot_syst + '/'
 
     # If the sub-folder doesn't exist, create it before moving the file.
     full_path = 'isochrones/' + sub_folder
     if not exists(full_path):
         makedirs(full_path)
 
-    print 'Query CMD using: {}.\n'.format(map_models["%s" % evol_track][1])
+    print 'Query CMD using: {}.'.format(map_models["%s" % evol_track][1])
+    print "Requesting isochrones in the '{}' system.\n".format(phot_syst)
 
     # Run for given range in metallicity.
     for metal in z_range:
