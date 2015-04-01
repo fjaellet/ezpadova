@@ -16,7 +16,7 @@ import numpy as np
 from os.path import join, exists
 from os import makedirs
 
-#available tracks
+# Available tracks.
 map_models = {
     'PAR12': ('parsec_CAF09_v1.2S', 'PARSEC version 1.2S'),
     'PAR11': ('parsec_CAF09_v1.1', 'PARSEC version 1.1'),
@@ -27,6 +27,13 @@ map_models = {
     '2002': ('gi2000', 'Basic set of Girardi et al. (2002)')
 }
 
+# Available IMF models.
+map_imfs = {
+    'salpeter': ('tab_imf/imf_salpeter.dat'),
+    'chab_exp': ('tab_imf/imf_chabrier_exponential.dat'),
+    'chab_log_sal': ('tab_imf/imf_chabrier_lognormal_salpeter.dat'),
+    'kroupa': ('tab_imf/imf_kroupa_orig.dat')
+}
 
 __def_args__ = {'binary_frac': 0.3,
                 'binary_kind': 1,
@@ -95,35 +102,8 @@ def file_type(filename, stream=False):
 
     return None
 
-#map_carbon_stars = {
-    #'loidl': ('loidl01', 'Loidl et al. (2001) (as in Marigo et al. (2008) \
-#and Girardi et al. (2008))'),
-    #'aringer': ('aringer09', "Aringer et al. (2009) (Note: The interpolation \
-#scheme has been slightly improved w.r.t. to the paper's Fig. 19.")
-#}
 
-#map_interp = {
-    #'default': 0,
-    #'improved': 1
-#}
-
-#map_circum_Mstars = {
-    #'nodustM': ('no dust', ''),
-    #'sil': ('Silicates', 'Bressan et al. (1998)'),
-    #'AlOx': ('100% AlOx', 'Groenewegen (2006)'),
-    #'dpmod60alox40': ('60% Silicate + 40% AlOx', 'Groenewegen (2006)'),
-    #'dpmod': ('100% Silicate', 'Groenewegen (2006)')
-#}
-
-#map_circum_Cstars = {
-    #'nodustC': ('no dust', ''),
-    #'gra': ('Graphites', 'Bressan et al. (1998)'),
-    #'AMC': ('100% AMC', 'Groenewegen (2006)'),
-    #'AMCSIC15': ('85% AMC + 15% SiC', 'Groenewegen (2006)')
-#}
-
-def __get_url_args(model=None, carbon=None, interp=None, Mstars=None,
-    Cstars=None, dust=None, phot=None):
+def __get_url_args(model=None, imf=None, phot=None):
     """
     Update options in the URL query using internal shortcuts.
     """
@@ -133,20 +113,8 @@ def __get_url_args(model=None, carbon=None, interp=None, Mstars=None,
     if model is not None:
         d['isoc_kind'] = map_models["%s" % model][0]
 
-    # if carbon is not None:
-    #     d['kind_cspecmag'] = map_carbon_stars[carbon][0]
-
-    # if interp is not None:
-    #     d['kind_interp'] = map_interp[interp]
-
-    # if dust is not None:
-    #     d['dust_source'] = map_circum_Mstars[dust]
-
-    # if Cstars is not None:
-    #     d['dust_source'] = map_circum_Cstars[Cstars]
-
-    # if Mstars is not None:
-    #     d['dust_source'] = map_circum_Mstars[Mstars]
+    if imf is not None:
+        d['imf_file'] = map_imfs[imf]
 
     if phot is not None:
         d['photsys_file'] = 'tab_mag_odfnew/tab_mag_{0}.dat'.format(phot)
@@ -238,6 +206,12 @@ def read_params():
                 if reader[0] == 'ET':
                     evol_track = str(reader[1])
 
+                # Initial mass function.
+                if reader[0] == 'IF':
+                    imf_sel = str(reader[1])
+                    if imf_sel == 'chab_log':
+                        imf_sel = None
+
                 # Photometric system.
                 if reader[0] == 'PS':
                     phot_syst = str(reader[1])
@@ -254,13 +228,13 @@ def read_params():
                 if reader[0] == 'AR':
                     a_vals = map(float, reader[1:4])
 
-    return evol_track, phot_syst, z_range, a_vals
+    return evol_track, imf_sel, phot_syst, z_range, a_vals
 
 
 def main():
 
     # Read input parameters from file.
-    evol_track, phot_syst, z_range, a_vals = read_params()
+    evol_track, imf_sel, phot_syst, z_range, a_vals = read_params()
 
     # Sub-folder where isochrone files will be stored.
     if evol_track[:3] == 'PAR':
@@ -287,7 +261,7 @@ def main():
         print 'z = {}'.format(metal)
         # Call function to get isochrones.
         r = get_t_isochrones(a_vals, metal, model=evol_track,
-        phot=phot_syst)
+        imf=imf_sel, phot=phot_syst)
 
         # Define file name according to metallicity value.
         file_name = join(full_path + ('%0.6f' % metal) + '.dat')
