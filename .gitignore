@@ -1,4 +1,5 @@
 isochrones/
+commit_params.dat
 .ropeproject
 *.py[cod] 
 *.so 
